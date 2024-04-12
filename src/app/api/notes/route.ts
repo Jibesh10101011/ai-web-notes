@@ -10,7 +10,9 @@ export async function POST(req:Request) {
             return Response.json({message:"Unauthorized"},{status:401});
         }
         const body=await req.json();
+        
         const parseResult=createNoteSchema.safeParse(body);
+
         if(!parseResult.success) {
             console.log(parseResult.error);
             return Response.json({message:"Invalid input"},{status:400});
@@ -25,6 +27,8 @@ export async function POST(req:Request) {
                 userId
             },
         })
+
+        return Response.json({note},{status:200});
 
     } catch(error) {
         console.error(error);
