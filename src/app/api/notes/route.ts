@@ -1,5 +1,6 @@
+import { notesIndex } from "@/lib/db/pinecone";
 import prisma from "@/lib/db/prisma";
-import { createNoteSchema, updatedNoteSchema } from "@/lib/validation/note";
+import { createNoteSchema, deleteNoteSchema, updatedNoteSchema } from "@/lib/validation/note";
 import { auth } from "@clerk/nextjs";
 
 export async function POST(req: Request) {
@@ -13,23 +14,25 @@ export async function POST(req: Request) {
     const parseResult = createNoteSchema.safeParse(body);
 
     if (!parseResult.success) {
-      console.log(parseResult.error);
       return Response.json({ message: "Invalid input" }, { status: 400 });
     }
 
     const { title, content } = parseResult.data;
 
-    const note = await prisma.note.create({
-      data: {
-        title,
-        content,
-        userId,
-      },
-    });
+    const note=await prisma.$transaction(async(tx)=>{
+      const note = await tx.note.create({
+        data: {
+          title,
+          content,
+          userId,
+        },
+      });
 
+      return note;
+
+    })
     return Response.json({ note }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return Response.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
@@ -40,7 +43,6 @@ export async function PUT(req: Request) {
     const parseResult = updatedNoteSchema.safeParse(body);
 
     if (!parseResult.success) {
-      console.error(parseResult.error);
       return Response.json({ error: "Invalid input" }, { status: 400 });
     }
 
@@ -67,7 +69,6 @@ export async function PUT(req: Request) {
     });
     return Response.json({ updatedNote }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -75,7 +76,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const body = await req.json();
-    const parseResult = updatedNoteSchema.safeParse(body);
+    const parseResult = deleteNoteSchema.safeParse(body);
 
     if (!parseResult.success) {
       console.error(parseResult.error);
@@ -99,7 +100,6 @@ export async function DELETE(req: Request) {
     await prisma.note.delete({where: { id }});
     return Response.json({ message:"Not deleted" }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }

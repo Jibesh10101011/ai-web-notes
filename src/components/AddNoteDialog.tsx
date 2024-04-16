@@ -33,7 +33,6 @@ const AddNoteDialog: FC<AddNoteDialogProps> = ({ open, setOpen }) => {
       });
       form.reset();
       router.refresh();
-      setOpen(false);
 
     } catch(error) {
       console.error(error);

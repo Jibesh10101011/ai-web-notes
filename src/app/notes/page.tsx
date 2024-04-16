@@ -7,7 +7,7 @@ import { FC } from "react";
 interface pageProps {}
 
 export const metadata: Metadata = {
-  title: "Flowbrain - Notes",
+  title: "Notes-studnet",
 };
 
 const Page: FC<pageProps> = async ({}) => {
@@ -15,8 +15,8 @@ const Page: FC<pageProps> = async ({}) => {
   if (!userId) {
     throw Error("UserId undefined");
   }
-  const allNotes = await prisma.note.findMany({ where: { userId } });
 
+  const allNotes = await prisma.note.findMany({ where: { userId } });
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {allNotes.map((note) => (
