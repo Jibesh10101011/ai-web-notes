@@ -7,7 +7,7 @@ import { FC } from "react";
 interface pageProps {}
 
 export const metadata: Metadata = {
-  title: "Notes-studnet",
+  title: "Notes-student",
 };
 
 const Page: FC<pageProps> = async ({}) => {
